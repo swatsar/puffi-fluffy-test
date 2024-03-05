@@ -1,0 +1,265 @@
+/*
+Theme Name: Tested
+Theme URI: https://rumess.ru
+Author: TimeBronx
+Author URI: https://rumess.ru
+Description: Tested
+Requires at least: 6.0
+Tested up to: 6.4.3
+Requires PHP: 5.7
+Version: 1.0.0
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Template: twentytwentyfour
+Text Domain: tested
+Tags: 
+*/
+
+/* Заголовки */
+.back-head-title,
+.back-2head-title {
+    background-color: #d8613c;
+    padding: 10px !important;
+}
+
+/* Форма в шапке */
+.header-form {
+    padding: 0 20px;
+    margin-bottom: 40px;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    border: 2px solid #ffa50078;
+    border-radius: 20px;
+    animation: floating 5s infinite alternate;
+}
+
+.header-form h3 {
+    text-align: center;
+    color: white;
+    font-size: xx-large;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    position: relative;
+    z-index: 1;
+}
+
+/* Стили формы обратной связи */
+#feedback-form {
+    padding: 50px 20px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0px 0px 50px 0px rgb(195 19 19 / 36%);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 20px;
+    text-align: center;
+}
+
+#feedback-form .form-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+#feedback-form .form-group {
+    flex: 1;
+    margin-right: 10px;
+}
+
+#feedback-form input[type="text"],
+#feedback-form input[type="email"],
+#feedback-form input[type="tel"],
+#feedback-form textarea {
+    width: calc(100% - 20px);
+    padding: 10px;
+    border: 1px solid #ffa50078;
+    background-color: rgb(30 29 29 / 50%);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    box-shadow: inset 5px 5px 10px rgb(32 27 27 / 50%), inset -5px -5px 10px rgb(39 30 30 / 50%);
+    transition: all 0.3s ease;
+    color: white;
+}
+
+#feedback-form input[type="submit"] {
+    font-size: larger;
+    width: 100%;
+    padding: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    background-color: rgb(55 60 66 / 70%);
+    color: white;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    box-shadow: 10px 10px 15px rgb(0 0 0 / 20%), -10px -10px 15px rgb(0 0 0 / 50%);
+    margin-top: 20px;
+}
+
+#feedback-form input[type="submit"]:hover {
+    background-color: rgb(76 175 80 / 51%);
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1), -5px -5px 10px rgb(0 0 0 / 70%);
+}
+
+/* Мобильные устройства */
+@media (max-width: 600px) {
+    #feedback-form .form-group {
+        flex: 100%;
+        margin-right: 0;
+        text-align: center;
+    }
+    #feedback-form input[type="text"],
+    #feedback-form input[type="email"],
+    #feedback-form input[type="tel"],
+    #feedback-form textarea {
+        width: calc(100% - 20px);
+        margin: 5px 0;
+    }
+}
+
+/* Подписи для полей ввода */
+#feedback-form label {
+    color: white;
+    font-size: large;
+    margin-bottom: 5px;
+}
+
+/* Обязательные поля */
+#feedback-form .required::after {
+    content: "*";
+    color: red;
+}
+
+/* Стилизация для ошибок валидации */
+#feedback-form .error {
+    border: 2px solid red;
+}
+
+/* Задний фон 1 */
+.background-image1 {
+    position: relative;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(https://rumess.ru/wp-content/uploads/2024/02/2560x1600-Background-HD-Wallpaper-052.webp);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    z-index: 0;
+}
+
+/* Изменение цвета */
+.color-shift {
+    animation: color-shift 10s infinite linear;
+    will-change: filter;
+}
+
+@keyframes color-shift {
+    0% {
+        filter: hue-rotate(0deg);
+    }
+    100% {
+        filter: hue-rotate(360deg);
+    }
+}
+
+/* Стили для формы Contact Form 7 */
+.form-container {
+    background-color: #f0f0f0;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 8px 8px 15px #c0c0c0, -8px -8px 15px #ffffff;
+}
+
+.custom-input {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 10px;
+    box-shadow: inset 5px 5px 10px #c0c0c0, inset -5px -5px 10px #ffffff;
+}
+
+.custom-submit {
+    background-color: #d8613c;
+    color: white;
+    width: 250px;
+    padding: 15px 20px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 5px 5px 10px #c0c0c0, -5px -5px 10px #ffffff;
+}
+
+.custom-submit:hover {
+    background-color: #ff5722;
+}
+
+.custom-input:focus {
+    outline: none;
+    box-shadow: inset 3px 3px 6px #c0c0c0, inset -3px -3px 6px #ffffff;
+}
+
+.custom-input:hover {
+    box-shadow: inset 3px 3px 6px #c0c0c0, inset -3px -3px 6px #ffffff;
+}
+
+.my-form label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+    color: black;
+}
+
+.my-form label,
+.custom-input,
+.custom-submit {
+    display: block;
+}
+
+.wpcf7 form .wpcf7-response-output {
+    margin: 2em 0.5em 1em;
+    padding: 0.2em 1em;
+    border: 2px solid #00a0d2;
+    color: black;
+}
+
+/* Фон листа */
+@media only screen and (min-width: 768px) {
+    .a4-background {
+        transform: translate(-10%, 5%) rotate(6deg);
+        background-color: white;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        border-radius: 5px;
+        z-index: -1;
+    }
+
+    .a4-background::before {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-image: linear-gradient(45deg, transparent 25%, rgba(0, 0, 0, 0.05) 25%, rgba(0, 0, 0, 0.05) 50%, transparent 50%, transparent 75%, rgba(0, 0, 0, 0.05) 75%, rgba(0, 0, 0, 0.05));
+        background-size: 20px 20px;
+        z-index: -2;
+    }
+
+    /* Sticky Header */
+    .stick-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 999;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .logo {
+        position: relative;
+        z-index: 1;
+        top: 10px;
+        background-color: #f9f9f9;
+        border-radius: 50px;
+        padding: 5px !important;
+    }
+
+    .header-top-max {
+        max-height: 80px;
+    }
+}
