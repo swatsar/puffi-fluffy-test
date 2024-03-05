@@ -3,7 +3,7 @@
 defined( 'ABSPATH' ) || exit;
 
 // Определение версии темы
-define( 'CUSTOM_THEME_VERSION', '2.18.05' );
+define( 'CUSTOM_THEME_VERSION', '1.0' );
 
 // Определение путей к инклюдам и URL темы
 define( 'CUSTOM_INC', get_stylesheet_directory() . '/inc/' );
