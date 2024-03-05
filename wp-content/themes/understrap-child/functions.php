@@ -1,36 +1,50 @@
 <?php
+// Проверка наличия константы ABSPATH, если ее нет, то завершаем выполнение программы
 defined( 'ABSPATH' ) || exit;
 
-define( 'WP_THEME_VERSION', '2.18.05' );
-define( 'WP_INC', get_stylesheet_directory() . '/inc/' );
-define( 'WP_URL', get_stylesheet_directory_uri());
+// Определение версии темы
+define( 'CUSTOM_THEME_VERSION', '2.18.05' );
 
-require_once( WP_INC . 'custom_post_type.php');
-require_once( WP_INC . 'template_functions.php');
-require_once( WP_INC . 'ajax_functions.php');
+// Определение путей к инклюдам и URL темы
+define( 'CUSTOM_INC', get_stylesheet_directory() . '/inc/' );
+define( 'CUSTOM_URL', get_stylesheet_directory_uri());
 
-add_shortcode( 'show_realty', 'show_realty_func' );
+// Подключение файлов с пользовательскими типами записей, функциями шаблона и функциями AJAX
+require_once( CUSTOM_INC . 'custom_post_type.php');
+require_once( CUSTOM_INC . 'template_functions.php');
+require_once( CUSTOM_INC . 'ajax_functions.php');
 
-function show_realty_func(){
-    return get_realty_html();
+// Добавление shortcode [show_property] с функцией-обработчиком show_property_function()
+add_shortcode( 'show_property', 'show_property_function' );
+
+// Функция-обработчик для shortcode [show_property]
+function show_property_function(){
+    // Возвращает HTML с помощью функции get_property_html()
+    return get_property_html();
 }
 
-add_shortcode( 'add_realty_form', 'add_realty_form_func' );
+// Добавление shortcode [add_property_form] с функцией-обработчиком add_property_form_function()
+add_shortcode( 'add_property_form', 'add_property_form_function' );
 
-function add_realty_form_func(){
+// Функция-обработчик для shortcode [add_property_form]
+function add_property_form_function(){
+    // Захват вывода и подключение шаблона form-add-property.php
     ob_start();
-    get_template_part( 'templates/form','add-realty');
-    return ob_get_clean();
+    get_template_part( 'templates/form','add-property');
+    return ob_get_clean(); // Возвращает захваченный вывод
 }
 
-add_action( 'wp_enqueue_scripts', 'theme_enqueue_styles' );
+// Добавление действия wp_enqueue_scripts с функцией-обработчиком enqueue_theme_styles()
+add_action( 'wp_enqueue_scripts', 'enqueue_theme_styles' );
 
-function theme_enqueue_styles() {
-
-    wp_enqueue_script('child-js',  WP_URL.'/js/child-theme.js',array(),'1',true);
+// Функция для подключения стилей и скриптов
+function enqueue_theme_styles() {
+    // Подключение скрипта child-theme.js
+    wp_enqueue_script('child-js',  CUSTOM_URL.'/js/child-theme.js',array(),'1',true);
+    // Локализация скрипта child-js, добавление URL админ-панели и nonce
     wp_localize_script('child-js', 'child_js', array(
         'url' => admin_url('admin-ajax.php'),
-        'nonce'=> wp_create_nonce('child_ajax_security'),
+        'nonce'=> wp_create_nonce('custom_ajax_security'),
     ));
 }
 
