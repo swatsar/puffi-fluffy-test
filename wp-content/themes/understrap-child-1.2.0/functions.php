@@ -89,53 +89,236 @@ add_action( 'customize_controls_enqueue_scripts', 'understrap_child_customize_co
 /**
  * 
  */
-// Подключаем файлы с пользовательскими типами записей
-require_once get_stylesheet_directory() . '/includes/post-types.php';
 
-// Подключаем файлы с таксономиями
-require_once get_stylesheet_directory() . '/includes/taxonomies.php';
-
-// Подключаем файлы с метабоксами и произвольными полями
-require_once get_stylesheet_directory() . '/includes/meta-boxes.php';
-
-// Подключаем файлы с добавлением столбцов
-require_once get_stylesheet_directory() . '/includes/columns.php';
-
-// Обработка отправленной формы добавления недвижимости
-function handle_property_submission( $fields ) {
-    // Создаем новую запись недвижимости
-    $post_data = array(
-        'post_title'    => sanitize_text_field( $fields['type'] ), // Название поста будет типом недвижимости
-        'post_content'  => '', // Можно добавить описание, если нужно
-        'post_status'   => 'pending', // Предварительно сохраняем как черновик
-        'post_type'     => 'property' // Тип записи недвижимости
+// Регистрация типа поста "Недвижимость"
+function register_custom_post_type() {
+    $labels = array(
+        'name'               => 'Недвижимость',
+        'singular_name'      => 'Недвижимость',
+        'menu_name'          => 'Недвижимость',
+        'name_admin_bar'     => 'Недвижимость',
+        'add_new'            => 'Добавить новую',
+        'add_new_item'       => 'Добавить новую недвижимость',
+        'new_item'           => 'Новая недвижимость',
+        'edit_item'          => 'Редактировать недвижимость',
+        'view_item'          => 'Просмотр недвижимости',
+        'all_items'          => 'Вся недвижимость',
+        'search_items'       => 'Искать недвижимость',
+        'not_found'          => 'Нет результатов',
+        'not_found_in_trash' => 'В корзине нет недвижимости'
     );
+ 
+    $args = array(
+        'labels'              => $labels,
+        'public'              => true,
+        'show_in_rest'        => true, // Для Gutenberg
+        'has_archive'         => true,
+        'rewrite'             => array('slug' => 'property'),
+        'supports'            => array('title', 'editor', 'thumbnail', 'custom-fields'),
+    );
+ 
+    register_post_type('property', $args);
+}
+add_action('init', 'register_custom_post_type');
 
-    // Создаем пост недвижимости
-    $post_id = wp_insert_post( $post_data );
+// Регистрация таксономии "Тип недвижимости"
+function register_property_taxonomy() {
+    $labels = array(
+        'name'                       => 'Тип недвижимости',
+        'singular_name'              => 'Тип недвижимости',
+        'menu_name'                  => 'Тип недвижимости',
+        'search_items'               => 'Искать типы недвижимости',
+        'all_items'                  => 'Все типы недвижимости',
+        'parent_item'                => 'Родительский тип недвижимости',
+        'parent_item_colon'          => 'Родительский тип недвижимости:',
+        'edit_item'                  => 'Редактировать тип недвижимости',
+        'update_item'                => 'Обновить тип недвижимости',
+        'add_new_item'               => 'Добавить новый тип недвижимости',
+        'new_item_name'              => 'Новый тип недвижимости',
+        'not_found'                  => 'Тип недвижимости не найден',
+        'separate_items_with_commas' => 'Разделяйте типы недвижимости запятыми',
+        'add_or_remove_items'        => 'Добавить или удалить тип недвижимости',
+        'choose_from_most_used'      => 'Выбрать из наиболее используемых типов недвижимости',
+        'popular_items'              => 'Популярные типы недвижимости',
+        'back_to_items'              => 'Вернуться к типам недвижимости',
+    );
+ 
+    $args = array(
+        'labels'                     => $labels,
+        'hierarchical'               => true,
+        'show_ui'                    => true,
+        'show_in_rest'               => true, // Для Gutenberg
+        'show_admin_column'          => true,
+        'query_var'                  => true,
+    );
+ 
+    register_taxonomy('property_type', 'property', $args);
+}
+add_action('init', 'register_property_taxonomy');
 
-    // Сохраняем значения полей из формы как метаполя
-    update_post_meta( $post_id, 'area', sanitize_text_field( $fields['area'] ) );
-    update_post_meta( $post_id, 'price', sanitize_text_field( $fields['price'] ) );
-    update_post_meta( $post_id, 'address', sanitize_text_field( $fields['address'] ) );
-    update_post_meta( $post_id, 'living_area', sanitize_text_field( $fields['living_area'] ) );
-    update_post_meta( $post_id, 'floor', sanitize_text_field( $fields['floor'] ) );
+// Добавляем произвольные поля для типа поста "Недвижимость"
+function add_custom_fields() {
+    add_meta_box('property_details', 'Детали недвижимости', 'property_details_callback', 'property', 'normal', 'high');
+}
+add_action('add_meta_boxes', 'add_custom_fields');
 
-    // Сохраняем выбранный город
-    update_post_meta( $post_id, 'city', sanitize_text_field( $fields['city'] ) );
+function property_details_callback($post) {
+    wp_nonce_field(basename(__FILE__), 'property_nonce');
+    
+    $area = get_post_meta($post->ID, 'area', true);
+    $cost = get_post_meta($post->ID, 'cost', true);
+    $address = get_post_meta($post->ID, 'address', true);
+    $living_area = get_post_meta($post->ID, 'living_area', true);
+    $floor = get_post_meta($post->ID, 'floor', true);
+   /* $selected_city = get_post_meta($post->ID, 'selected_city', true); */
+    
+    echo '<label for="area">Площадь:</label>';
+    echo '<input type="text" id="area" name="area" value="' . esc_attr($area) . '" /><br>';
+    
+    echo '<label for="cost">Стоимость:</label>';
+    echo '<input type="text" id="cost" name="cost" value="' . esc_attr($cost) . '" /><br>';
+    
+    echo '<label for="address">Адрес:</label>';
+    echo '<input type="text" id="address" name="address" value="' . esc_attr($address) . '" /><br>';
+    
+    echo '<label for="living_area">Жилая площадь:</label>';
+    echo '<input type="text" id="living_area" name="living_area" value="' . esc_attr($living_area) . '" /><br>';
+    
+    echo '<label for="floor">Этаж:</label>';
+    echo '<input type="text" id="floor" name="floor" value="' . esc_attr($floor) . '" /><br>';
+    
+    // Добавляем поле выбора города
+   /* $cities = get_posts(array('post_type' => 'city', 'posts_per_page' => -1));
+    echo '<label for="selected_city">Выберите город:</label>';
+    echo '<select id="selected_city" name="selected_city">';
+    echo '<option value="">Выберите город</option>';
+    foreach ($cities as $city) {
+        echo '<option value="' . $city->ID . '" ' . selected($selected_city, $city->ID, false) . '>' . $city->post_title . '</option>';
+    }
+    echo '</select><br>';
+    */
+    // Добавляем поле для загрузки фотографии
+    echo '<label for="property_image">Загрузить фотографию:</label>';
+    echo '<input type="file" id="property_image" name="property_image" /><br>';
+}
 
-    // Обработка загруженного изображения
-    if ( isset( $fields['image'] ) && ! empty( $fields['image']['name'] ) ) {
-        $upload_overrides = array( 'test_form' => false );
-        $uploaded_image = wp_handle_upload( $fields['image'], $upload_overrides );
-        
-        if ( isset( $uploaded_image['url'] ) ) {
-            update_post_meta( $post_id, 'property_image', esc_url( $uploaded_image['url'] ) );
+// Сохраняем значения произвольных полей
+function save_custom_fields($post_id) {
+    if (!isset($_POST['property_nonce']) || !wp_verify_nonce($_POST['property_nonce'], basename(__FILE__))) {
+        return $post_id;
+    }
+ 
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+        return $post_id;
+    }
+ 
+    $fields = array('area', 'cost', 'address', 'living_area', 'floor', 'selected_city');
+    foreach ($fields as $field) {
+        if (isset($_POST[$field])) {
+            update_post_meta($post_id, $field, sanitize_text_field($_POST[$field]));
+        }
+    }
+    
+    // Загружаем изображение и устанавливаем его как изображение записи (featured image)
+    if (!empty($_FILES['property_image']['name'])) {
+        $upload_overrides = array('test_form' => false);
+        $uploaded_file = wp_handle_upload($_FILES['property_image'], $upload_overrides);
+
+        if (!empty($uploaded_file['url'])) {
+            $attachment = array(
+                'post_mime_type' => $_FILES['property_image']['type'],
+                'post_title' => sanitize_file_name($_FILES['property_image']['name']),
+                'post_content' => '',
+                'post_status' => 'inherit'
+            );
+
+            $attach_id = wp_insert_attachment($attachment, $uploaded_file['file'], $post_id);
+            if (!is_wp_error($attach_id)) {
+                require_once(ABSPATH . 'wp-admin/includes/image.php');
+                $attach_data = wp_generate_attachment_metadata($attach_id, $uploaded_file['file']);
+                wp_update_attachment_metadata($attach_id, $attach_data);
+                set_post_thumbnail($post_id, $attach_id);
+            }
         }
     }
 }
+add_action('save_post', 'save_custom_fields');
 
-// Добавляем обработчик для формы WPForms
-add_action( 'wpforms_process_complete_236', 'handle_property_submission', 10, 4 ); 
+// Регистрация типа поста "База Городов"
+function register_city_post_type() {
+    $labels = array(
+        'name'               => 'База Городов',
+        'singular_name'      => 'Город',
+        'menu_name'          => 'База Городов',
+        'name_admin_bar'     => 'Город',
+        'add_new'            => 'Добавить новый',
+        'add_new_item'       => 'Добавить новый город',
+        'new_item'           => 'Новый город',
+        'edit_item'          => 'Редактировать город',
+        'view_item'          => 'Просмотр города',
+        'all_items'          => 'Все города',
+        'search_items'       => 'Искать города',
+        'not_found'          => 'Города не найдены',
+        'not_found_in_trash' => 'В корзине нет городов'
+    );
+ 
+    $args = array(
+        'labels'              => $labels,
+        'public'              => true,
+        'show_in_rest'        => true, // Для Gutenberg
+        'has_archive'         => true,
+        'rewrite'             => array('slug' => 'city'),
+        'supports'            => array('title', 'editor', 'thumbnail', 'custom-fields'),
+    );
+ 
+    register_post_type('city', $args);
+}
+add_action('init', 'register_city_post_type');
 
+// Добавляем произвольное поле для выбора города к типу поста "Недвижимость"
+function add_city_field() {
+    add_meta_box('city_select', 'Выбор города', 'city_select_callback', 'property', 'normal', 'high');
+}
+add_action('add_meta_boxes', 'add_city_field');
 
+function city_select_callback($post) {
+    wp_nonce_field(basename(__FILE__), 'city_nonce');
+    
+    $selected_city = get_post_meta($post->ID, 'selected_city', true);
+    $cities = get_posts(array('post_type' => 'city', 'posts_per_page' => -1));
+    
+    echo '<label for="selected_city">Выберите город:</label>';
+    echo '<select id="selected_city" name="selected_city">';
+    echo '<option value="">Выберите город</option>';
+    foreach ($cities as $city) {
+        echo '<option value="' . $city->ID . '" ' . selected($selected_city, $city->ID, false) . '>' . $city->post_title . '</option>';
+    }
+    echo '</select>';
+}
+
+function save_city_field($post_id) {
+    if (!isset($_POST['city_nonce']) || !wp_verify_nonce($_POST['city_nonce'], basename(__FILE__))) {
+        return $post_id;
+    }
+ 
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+        return $post_id;
+    }
+ 
+    if (isset($_POST['selected_city'])) {
+        update_post_meta($post_id, 'selected_city', sanitize_text_field($_POST['selected_city']));
+    }
+}
+add_action('save_post', 'save_city_field');
+
+// Связываем типы постов "Недвижимость" и "База Городов"
+function link_property_to_city($query) {
+    if (is_admin() || !$query->is_main_query()) {
+        return;
+    }
+ 
+    if (is_post_type_archive('city') || is_tax('property_type')) {
+        $query->set('post_type', array('property', 'city'));
+    }
+}
+add_action('pre_get_posts', 'link_property_to_city');
