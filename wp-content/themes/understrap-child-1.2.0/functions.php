@@ -86,3 +86,56 @@ function understrap_child_customize_controls_js() {
 	);
 }
 add_action( 'customize_controls_enqueue_scripts', 'understrap_child_customize_controls_js' );
+/**
+ * 
+ */
+// Подключаем файлы с пользовательскими типами записей
+require_once get_stylesheet_directory() . '/includes/post-types.php';
+
+// Подключаем файлы с таксономиями
+require_once get_stylesheet_directory() . '/includes/taxonomies.php';
+
+// Подключаем файлы с метабоксами и произвольными полями
+require_once get_stylesheet_directory() . '/includes/meta-boxes.php';
+
+// Подключаем файлы с добавлением столбцов
+require_once get_stylesheet_directory() . '/includes/columns.php';
+
+// Обработка отправленной формы добавления недвижимости
+function handle_property_submission( $fields ) {
+    // Создаем новую запись недвижимости
+    $post_data = array(
+        'post_title'    => sanitize_text_field( $fields['type'] ), // Название поста будет типом недвижимости
+        'post_content'  => '', // Можно добавить описание, если нужно
+        'post_status'   => 'pending', // Предварительно сохраняем как черновик
+        'post_type'     => 'property' // Тип записи недвижимости
+    );
+
+    // Создаем пост недвижимости
+    $post_id = wp_insert_post( $post_data );
+
+    // Сохраняем значения полей из формы как метаполя
+    update_post_meta( $post_id, 'area', sanitize_text_field( $fields['area'] ) );
+    update_post_meta( $post_id, 'price', sanitize_text_field( $fields['price'] ) );
+    update_post_meta( $post_id, 'address', sanitize_text_field( $fields['address'] ) );
+    update_post_meta( $post_id, 'living_area', sanitize_text_field( $fields['living_area'] ) );
+    update_post_meta( $post_id, 'floor', sanitize_text_field( $fields['floor'] ) );
+
+    // Сохраняем выбранный город
+    update_post_meta( $post_id, 'city', sanitize_text_field( $fields['city'] ) );
+
+    // Обработка загруженного изображения
+    if ( isset( $fields['image'] ) && ! empty( $fields['image']['name'] ) ) {
+        $upload_overrides = array( 'test_form' => false );
+        $uploaded_image = wp_handle_upload( $fields['image'], $upload_overrides );
+        
+        if ( isset( $uploaded_image['url'] ) ) {
+            update_post_meta( $post_id, 'property_image', esc_url( $uploaded_image['url'] ) );
+        }
+    }
+}
+
+// Добавляем обработчик для формы WPForms
+add_action( 'wpforms_process_complete_236', 'handle_property_submission', 10, 4 ); 
+
+
